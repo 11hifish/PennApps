@@ -1,6 +1,21 @@
 /*
-MODIFIED AND ADAPTED FROM ARDUINO EXAMPLE.
-circuit:
+By Sihao Yu, Haohan Shi for PennApps XIV
+
+MODIFIED AND ADAPTED FROM ARDUINO EXAMPLE and WIFI101 EXAMPLE.
+
+ This example connects to an unencrypted Wifi network.
+ Then it prints the  MAC address of the Wifi shield,
+ the IP address obtained, and other network details.
+
+ Circuit:
+ * WiFi shield attached
+
+ created 13 July 2010
+ by dlf (Metodo2 srl)
+ modified 31 May 2012
+ by Tom Igoe
+
+ Circuit:
  * LED attached from pin 13 to ground
  * pushbutton attached from pin 2 to +5V
  * 10K resistor attached from pin 2 to ground
@@ -12,18 +27,27 @@ circuit:
  modified 28 Dec 2012
  by Mike Walters
  modified 11 Sep 2016
- by Sihao Yu for PennApps XIV
 
  This example code is in the public domain.
 
  http://www.arduino.cc/en/Tutorial/Debounce
+ and
+ https://www.arduino.cc/en/Reference/WiFi101
  */
+
+#include <SPI.h>
+#include <WiFi101.h>
 
 // constants won't change. They're used here to
 // set pin numbers:
 const int buttonPin = 2;    // the number of the pushbutton pin
 const int ledZero = 4;
 
+//set Network information
+char ssid[] = "Haohan iPhone";     //  your network SSID (name)
+char pass[] = "shihaohan";  // your network password
+int status = WL_IDLE_STATUS;     // the Wifi radio's status
+char serverIP[] = "xxx.xxx.xxx.xxx";    //the IP to get request from
 // Variables will change:
 int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
@@ -35,11 +59,12 @@ long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
 int ledCount = 3;
+
 void setup() {
   Serial.begin(9600);
   Serial.println("RGB led debounce");
+  // initialize the LED and button pin:
   pinMode(buttonPin, INPUT);
-  // initialize the LED pin as an output:
   pinMode(ledZero, OUTPUT);
   pinMode(ledZero + 1, OUTPUT);
   pinMode(ledZero + 2, OUTPUT);
@@ -48,7 +73,26 @@ void setup() {
   digitalWrite(ledZero, ledState);
   digitalWrite(ledZero + 1, ledState);
   digitalWrite(ledZero + 2, ledState);
+
+  // check for the presence of the shield:
+  if (WiFi.status() == WL_NO_SHIELD) {
+    Serial.println("WiFi shield not present");
+    // don't continue:
+    while (true);
+
+  // attempt to connect to Wifi network:
+  while ( status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    // Connect to WPA/WPA2 network:
+    status = WiFi.begin(ssid, pass);
+
+    // wait 5 seconds for retry:
+    delay(5000);
+  }
+  printWifiData();
 }
+
 void onButtonPressed(){
   ledCount += 1;
   ledCount %= 4;
