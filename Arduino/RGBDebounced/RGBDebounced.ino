@@ -22,10 +22,10 @@ circuit:
 // constants won't change. They're used here to
 // set pin numbers:
 const int buttonPin = 2;    // the number of the pushbutton pin
-const int ledEmpty = 2;
+const int ledZero = 4;
 
 // Variables will change:
-int ledState = HIGH;         // the current state of the output pin
+int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
 
@@ -34,32 +34,32 @@ int lastButtonState = LOW;   // the previous reading from the input pin
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
-int ledCount = 0;
+int ledCount = 3;
 void setup() {
   Serial.begin(9600);
-  Serial.println("RGB led debo");
+  Serial.println("RGB led debounce");
   pinMode(buttonPin, INPUT);
   // initialize the LED pin as an output:
-  pinMode(ledEmpty + 1, OUTPUT);
-  pinMode(ledEmpty + 2, OUTPUT);
-  pinMode(ledEmpty + 3, OUTPUT);
+  pinMode(ledZero, OUTPUT);
+  pinMode(ledZero + 1, OUTPUT);
+  pinMode(ledZero + 2, OUTPUT);
 
   // set initial LED state
-  digitalWrite(ledEmpty + 1, ledState);
-  digitalWrite(ledEmpty + 2, ledState);
-  digitalWrite(ledEmpty + 3, ledState);
+  digitalWrite(ledZero, ledState);
+  digitalWrite(ledZero + 1, ledState);
+  digitalWrite(ledZero + 2, ledState);
 }
-void onButtonPress(){
+void onButtonPressed(){
   ledCount += 1;
   ledCount %= 4;
 }
 void ledDisplay(){
 //  Serial.println(ledCount);
-  for(int i = 1; i < 4; i++){
+  for(int i = 0; i < 3; i++){
     if( i == ledCount){
-      digitalWrite(ledEmpty + i, HIGH);
+      digitalWrite(ledZero + i, HIGH);
     }else{
-      digitalWrite(ledEmpty + i, LOW);
+      digitalWrite(ledZero + i, LOW);
     }
   }
 }
@@ -78,7 +78,7 @@ void loop() {
       buttonState = curButton;
       // only toggle the LED if the new button state is HIGH
       if (buttonState == HIGH) {
-        onButtonPress();
+        onButtonPressed();
       }
     }
   }
