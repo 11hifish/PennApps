@@ -44,6 +44,7 @@ const int buttonPin = 2;    // the number of the pushbutton pin
 const int ledWait = 4;
 const int ledYes = 5;
 const int ledNo = 6;
+char state[] = "wait";
 
 //set Network information
 char ssid[] = "Haohan iPhone";     //  your network SSID (name)
@@ -61,6 +62,15 @@ long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
 int ledCount = 3;
+
+bool processed = false;
+
+void printWifiData() {
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+}
 
 void setup() {
   Serial.begin(9600);
@@ -80,7 +90,7 @@ void setup() {
     Serial.println("WiFi shield not found");
     // don't continue:
     while (true);
-
+  }
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) {
     Serial.print("Attempting to connect to  WPA SSID: ");
@@ -88,23 +98,17 @@ void setup() {
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, pass);
 
-    // wait 5 seconds for retry:
-    delay(5000);
+    // wait 10 seconds for retry:
+    delay(10000);
   }
   printWifiData();
 }
 
-void printWifiData() {
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-  Serial.println(ip);
-  
 void onButtonPressed(){
   ledCount += 1;
   ledCount %= 4;
 }
+
 void ledDisplay(){
 //  Serial.println(ledCount);
   for(int i = 0; i < 3; i++){
