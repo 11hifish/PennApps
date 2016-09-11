@@ -154,6 +154,7 @@ void sendContent(char* s){
     if (client.connect(server, port )) {
       Serial.println("connected to server");
       // Make a HTTP request:
+      client.flush();
       client.write(s);
       Serial.println(s);
       return;
@@ -166,7 +167,7 @@ void sendContent(char* s){
 void getStatus(char* &buffer, int size){
   //send server an getStatus request
   while(true){
-    Serial.println("\nStarting connection to server...");
+    Serial.println("\nConnecting server for result...");
     // if you get a connection, report back via serial:
     if (client.connect(server, port )) {
       Serial.println("connected to server");
@@ -174,7 +175,7 @@ void getStatus(char* &buffer, int size){
       char* str = sprintf("UPDATE")//_%s",DEVICE_ID);
       client.write(str);
       Serial.println(s);
-      return;
+      break;
     }
     else{
       delay(1000);
