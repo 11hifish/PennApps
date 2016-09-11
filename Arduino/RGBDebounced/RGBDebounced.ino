@@ -37,20 +37,27 @@ MODIFIED AND ADAPTED FROM ARDUINO EXAMPLE and WIFI101 EXAMPLE.
 
 #include <SPI.h>
 #include <WiFi101.h>
-
-// constants won't change. They're used here to
+#define NOTHING 0xCC
+#define WAITING 0xDD
+#define DENY 0xEE
+#define ACCEPT 0xFF
+typedef uint8_t state;
+// constants won't change. They'reused here to
 // set pin numbers:
 const int buttonPin = 2;    // the number of the pushbutton pin
 const int ledWait = 4;
 const int ledYes = 5;
 const int ledNo = 6;
-char state[] = "wait";
 
+state s = WAIT;
 //set Network information
 char ssid[] = "Haohan iPhone";     //  your network SSID (name)
 char pass[] = "shihaohan";  // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 char serverIP[] = "xxx.xxx.xxx.xxx";    //the IP to get request from
+
+SocketIOClient client;
+
 // Variables will change:
 int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
@@ -60,17 +67,6 @@ int lastButtonState = LOW;   // the previous reading from the input pin
 // will quickly become a bigger number than can be stored in an int.
 long lastDebounceTime = 0;  // the last time the output pin was toggled
 long debounceDelay = 50;    // the debounce time; increase if the output flickers
-
-int ledCount = 3;
-
-bool processed = false;
-
-void printWifiData() {
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-}
 
 void setup() {
   Serial.begin(9600);
@@ -93,32 +89,50 @@ void setup() {
   }
   // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to  WPA SSID: ");
+    Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, pass);
-
     // wait 10 seconds for retry:
     delay(10000);
   }
   printWifiData();
 }
 
-void onButtonPressed(){
-  ledCount += 1;
-  ledCount %= 4;
+void printWifiData() {
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
 }
 
 void ledDisplay(){
 //  Serial.println(ledCount);
-  for(int i = 0; i < 3; i++){
-    if( i == ledCount){
-      digitalWrite(ledZero + i, HIGH);
-    }else{
-      digitalWrite(ledZero + i, LOW);
-    }
+  if (s == 0xCC) {
+    digitalWrite(ledNo, LOW);
+    digitalWrite(ledYes, LOW);
+    digitalWrite(ledWait, LOW);
+  else if (s == 0xDD) {
+    digitalWrite(ledWait, HIGH);
+    digitalWrite(ledYes, LOW);
+    digitalWrite(ledNo, LOW);
+  }
+  else if (s == 0xEE) {
+    digitalWrite(ledWait, LOW);
+    digitalWrite(ledYes, LOW);
+    digitalWrite(ledNo, HIGH);
+  }
+  else{
+    digitalWrite(ledWait, LOW);
+    digitalWrite(ledYes, HIGH);
+    digitalWrite(ledNo, LOW);    
   }
 }
+
+void changeState(state n) {
+  s = n;
+}
+
 void loop() {
   // read the state of the switch into a local variable:
   int curButton = digitalRead(buttonPin);
@@ -130,15 +144,24 @@ void loop() {
 
   if ((millis() - lastDebounceTime) > debounceDelay) {
     // if the button state has changed:
-    if (curButton != buttonState) {
-      buttonState = curButton;
-      // only toggle the LED if the new button state is HIGH
-      if (buttonState == HIGH) {
-        onButtonPressed();
+    if s == 0xCC: {
+      if (curButton != buttonState) {
+        buttonState = curButton;
+        // only toggle the LED if the new button state is HIGH
+        if (buttonState == HIGH) {
+          changeState(0xDD);
+          '''code to send a doorbell ring request'''
+          ledDisplay();
+          delay(3000);
+        }
+        lastButtonState = curButton;
       }
     }
   }
+  '''code to send a normal request'''
+  '''listen to reply from server'''
+  '''call changeState(0x..) when applicable'''
+  delay(3000);
   ledDisplay();
-  lastButtonState = curButton;
 }
 
