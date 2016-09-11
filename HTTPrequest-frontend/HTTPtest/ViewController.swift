@@ -12,6 +12,7 @@ class ViewController: UIViewController {
 
     @IBOutlet weak var Switch: UISwitch!
     @IBOutlet weak var Button: UIButton!
+
     @IBAction func SendButtonPressed(sender: AnyObject) {
 
         
@@ -32,7 +33,9 @@ class ViewController: UIViewController {
             
             let responseString = NSString(data: data!, encoding: NSUTF8StringEncoding)
             print("responseString = \(responseString)")
+            print(responseString)
         }
+        
         task.resume()
     }
     override func viewDidLoad() {

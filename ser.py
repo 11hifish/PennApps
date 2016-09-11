@@ -14,8 +14,13 @@ NormalClient=1
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to the port
+<<<<<<< HEAD
 server_address = ('', 80)
 print('starting up on %s port %s' % (server_address[0],server_address[1]))
+=======
+server_address = ('localhost', 10002)
+print('starting up on %s port %s', server_address[0],server_address[1])
+>>>>>>> f5f98341bfd779edbf2cb1c460990d05303f7638
 sock.bind(server_address)
 sock.listen(1)
 q = []
@@ -52,14 +57,19 @@ while True:
     print('waiting for a connection')
     connection, client_address = sock.accept()
     try:
-        print ('connection from %s:%s' % client_address)
+        print ('connection from', client_address)
 
         # Receive the data in small chunks and retransmit it
         while True:
+<<<<<<< HEAD
+            data = connection.recv(50)
+            print ('received information: %s', data)
+=======
             data = connection.recv(64)
             print ('received information:')
             print (len(data))
 
+>>>>>>> 563cc75781b51c54c7a244c85a50e6a04c7435ed
             if data:
                 # s = str(data).split("x")
                 # print(s)
@@ -87,9 +97,15 @@ while True:
 #                     connection.sendall("Received!")
 #                     change_status_to_received(q, id, status)
 
+<<<<<<< HEAD
             # else:
             print('no more data from %s:%s'% client_address)
             break
+=======
+            else:
+                print('no more data from', client_address)
+                break
+>>>>>>> f5f98341bfd779edbf2cb1c460990d05303f7638
             
     finally:
         # Clean up the connection
