@@ -1,0 +1,2 @@
+default:
+	g++ SocketIOClient.cpp examples/hello/hello.cpp -o hello.exe
