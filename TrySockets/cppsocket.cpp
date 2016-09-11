@@ -154,12 +154,14 @@ int main(int argc , char *argv[])
 {
     tcp_client c;
     string host;
-
+    int prt;
     cout<<"Enter hostname : ";
     cin>>host;
+    cout<<"Enter port : ";
+    cin>>prt;
 
     //connect to host
-    c.conn(host , 80);
+    c.conn(host , prt);
 
     //send some data
     c.send_data("GET / HTTP/1.1\r\n\r\n");
