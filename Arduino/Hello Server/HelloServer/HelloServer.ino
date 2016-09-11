@@ -49,8 +49,8 @@ const int ledZero = 4;
 char ssid[] = "Haohan iPhone";     //  your network SSID (name)
 char pass[] = "shihaohan";  // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
-char serverIP[] = "128.2.182.224";    //the IP to get request from
-int port = 8080;
+char serverIP[] = "128.91.19.20";    //the IP to get request from
+int port = 10000;
 // Variables will change:
 int ledState = LOW;         // the current state of the output pin
 int buttonState;             // the current reading from the input pin
