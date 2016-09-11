@@ -51,17 +51,19 @@ while True:
 
         # Receive the data in small chunks and retransmit it
         while True:
+<<<<<<< HEAD
             data = connection.recv(50)
             print ('received information: %s', data)
+=======
+            data = connection.recv(64)
+            print ('received information:')
+            print (str(data))
+
+>>>>>>> 563cc75781b51c54c7a244c85a50e6a04c7435ed
             if data:
-                print(data)
-                s = data.split("_")
-                print(s)
-                if len(s) != 4:
-                    print("Parse Failure: ")
-                    print(s)
-                    continue
-                s = s[1:]
+                s = str(data).split("_")
+                if len(s) != 3:
+                    print("Parse Failure: +")
                 print(s)
                 type = s[0]
                 id = int(s[1])
