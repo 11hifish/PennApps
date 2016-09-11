@@ -41,6 +41,7 @@ MODIFIED AND ADAPTED FROM ARDUINO EXAMPLE and WIFI101 EXAMPLE.
 #define WAITING 0xDD
 #define DENY 0xEE
 #define ACCEPT 0xFF
+#define DEVICE_ID "0_65535"
 typedef uint8_t state;
 // constants won't change. They'reused here to
 // set pin numbers:
@@ -49,14 +50,25 @@ const int ledWait = 4;
 const int ledYes = 5;
 const int ledNo = 6;
 
-state s = WAIT;
+state s = WAITING;
 //set Network information
 char ssid[] = "Haohan iPhone";     //  your network SSID (name)
 char pass[] = "shihaohan";  // your network password
-int status = WL_IDLE_STATUS;     // the Wifi radio's status
-char serverIP[] = "xxx.xxx.xxx.xxx";    //the IP to get request from
 
-SocketIOClient client;
+int keyIndex = 0;            // your network key Index number (needed only for WEP)
+
+int status = WL_IDLE_STATUS;
+// if you don't want to use DNS (and reduce your sketch size)
+// use the numeric IP instead of the name for the server:
+//IPAddress server(74,125,232,128);  // numeric IP for Google (no DNS)
+//char server[] = "yusihao51.pythonanywhere.com";    // name address for Google (using DNS)
+IPAddress server(172,20,10,9);
+int port = 80;
+
+// Initialize the Ethernet client library
+// with the IP address and port of the server
+// that you want to connect to (port 80 is default for HTTP):
+WiFiSSLClient client;
 
 // Variables will change:
 int ledState = LOW;         // the current state of the output pin
@@ -94,9 +106,11 @@ void setup() {
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, pass);
     // wait 10 seconds for retry:
-    delay(10000);
+    delay(8000);
   }
-  printWifiData();
+  Serial.println("Connected to wifi");
+  printWifiStatus();
+  sendContent("Initialize Server");
 }
 
 void printWifiData() {
@@ -108,16 +122,17 @@ void printWifiData() {
 
 void ledDisplay(){
 //  Serial.println(ledCount);
-  if (s == 0xCC) {
+  if (s == NOTHING) {
     digitalWrite(ledNo, LOW);
     digitalWrite(ledYes, LOW);
     digitalWrite(ledWait, LOW);
-  else if (s == 0xDD) {
+    }
+  else if (s == WAITING) {
     digitalWrite(ledWait, HIGH);
     digitalWrite(ledYes, LOW);
     digitalWrite(ledNo, LOW);
   }
-  else if (s == 0xEE) {
+  else if (s == DENY) {
     digitalWrite(ledWait, LOW);
     digitalWrite(ledYes, LOW);
     digitalWrite(ledNo, HIGH);
@@ -132,7 +147,52 @@ void ledDisplay(){
 void changeState(state n) {
   s = n;
 }
+void sendContent(char* s){
+  while(true){
+    Serial.println("\nStarting connection to server...");
+    // if you get a connection, report back via serial:
+    if (client.connect(server, port )) {
+      Serial.println("connected to server");
+      // Make a HTTP request:
+      client.write(s);
+      Serial.println(s);
+      return;
+    }
+    else{
+      delay(3000);
+    }
+  }
+}
+void getStatus(char* &buffer, int size){
+  //send server an getStatus request
+  while(true){
+    Serial.println("\nStarting connection to server...");
+    // if you get a connection, report back via serial:
+    if (client.connect(server, port )) {
+      Serial.println("connected to server");
+      // Make a HTTP request:
+      char* str = sprintf("UPDATE_%s",DEVICE_ID);
+      client.write(str);
+      Serial.println(s);
+      return;
+    }
+    else{
+      delay(1000);
+    }
+  }
+  //wait for server response
+  //assume server retain connection
+  while(!client.available()){
+    delay(500);
+  }
+  int i = 0;
+  while (client.available() && i < size) {
+    char c = client.read();
+    Serial.write(c);
+    buffer[i] = c;
+  }
 
+}
 void loop() {
   // read the state of the switch into a local variable:
   int curButton = digitalRead(buttonPin);
@@ -144,24 +204,48 @@ void loop() {
 
   if ((millis() - lastDebounceTime) > debounceDelay) {
     // if the button state has changed:
-    if s == 0xCC: {
+    if (s == NOTHING) {
       if (curButton != buttonState) {
         buttonState = curButton;
         // only toggle the LED if the new button state is HIGH
         if (buttonState == HIGH) {
-          changeState(0xDD);
-          '''code to send a doorbell ring request'''
+          changeState(WAITING);
           ledDisplay();
-          delay(3000);
+          char* str = sprintf("Pressed_%s",DEVICE_ID);
+          sendContent(str);
+          char* buffer = new char[100];
+          getStatus(buffer,100);
+          if (buffer == "ACCEPTED"){
+            changeState(ACCEPT);
+          }
+          if (buffer == "DENY"){
+            changeState(DENY);
+          }
         }
         lastButtonState = curButton;
       }
     }
   }
-  '''code to send a normal request'''
-  '''listen to reply from server'''
-  '''call changeState(0x..) when applicable'''
-  delay(3000);
+  // '''code to send a normal request'''
+  // '''listen to reply from server'''
+  // '''call changeState(0x..) when applicable'''
   ledDisplay();
+  delay(3000);
 }
 
+void printWifiStatus() {
+  // print the SSID of the network you're attached to:
+  Serial.print("SSID: ");
+  Serial.println(WiFi.SSID());
+
+  // print your WiFi shield's IP address:
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+
+  // print the received signal strength:
+  long rssi = WiFi.RSSI();
+  Serial.print("signal strength (RSSI):");
+  Serial.print(rssi);
+  Serial.println(" dBm");
+}
