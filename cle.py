@@ -5,7 +5,7 @@ import sys
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Connect the socket to the port where the server is listening
-server_address = ('localhost', 10000)
+server_address = ('10.251.95.255', 10002)
 print('connecting to port %s', server_address)
 sock.connect(server_address)
 try:
@@ -14,6 +14,7 @@ try:
 #     message = 'This is the message.  It will be repeated.'
 #     print('sending "%s"', message)
 #     sock.sendall(message)
+
     id = 30
     id_sent = str(id)
     sock.sendall(id_sent)
