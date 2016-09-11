@@ -14,13 +14,8 @@ NormalClient=1
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to the port
-<<<<<<< HEAD
-server_address = ('localhost', 10002)
-print('starting up on %s port %s', server_address[0],server_address[1])
-=======
 server_address = ('', 80)
 print('starting up on %s port %s' % (server_address[0],server_address[1]))
->>>>>>> 17a32263e3f21caa8ca4ec27c9545b30eacc21db
 sock.bind(server_address)
 sock.listen(1)
 q = []
@@ -46,6 +41,11 @@ def change_status_to_received(q, id, status):
             q.remove((time, id, status))
             q.insert((time, id, status_receivedResponse))
 
+def notifyPhone():
+    # TOBE ENABLED BY SWIFT
+    pass
+
+requestCount = 0;
 
 while True:
     # Wait for a connection
@@ -58,31 +58,39 @@ while True:
         while True:
             data = connection.recv(64)
             print ('received information:')
-            print (str(data))
+            print (len(data))
 
             if data:
-                s = str(data).split("_")
-                if len(s) != 3:
-                    print("Parse Failure: +")
-                print(s)
-                type = s[0]
-                id = int(s[1])
-                status = int(s[2])
-                if type == "Pressed":
-                    time = insertAndAddTime(q, id, status)
-                    print('sending data back to the client')
-                    connection.sendall(time+"_"+str(id)+"_"+str(status))
-                    change_status_to_sent(q, id, status)
-                if type == "Client":
-                    print(1)
-#                    if status == 1:
-                    connection.sendall("Received!")
-                    change_status_to_received(q, id, status)
+                # s = str(data).split("x")
+                # print(s)
+                if (str(data).count("\\")>10):
+                    notifyPhone();
+                    requestCount += 1;
 
-            else:
-                print('no more data from %s:%s'% client_address)
-                break
+                    if (requestCount > 8):
+                        connection.sendall("ACCEPTED")
+                    
+#                 if len(s) != 3:
+#                     print("Parse Failure: +")
+#                 print(s)
+#                 type = s[0]
+#                 id = int(s[1])
+#                 status = int(s[2])
+#                 if type == "Pressed":
+#                     time = insertAndAddTime(q, id, status)
+#                     print('sending data back to the client')
+#                     connection.sendall(time+"_"+str(id)+"_"+str(status))
+#                     change_status_to_sent(q, id, status)
+#                 if type == "Client":
+#                     print(1)
+# #                    if status == 1:
+#                     connection.sendall("Received!")
+#                     change_status_to_received(q, id, status)
+
+            # else:
+            print('no more data from %s:%s'% client_address)
+            break
             
     finally:
         # Clean up the connection
-        connection.close()
+        connection.close() 
