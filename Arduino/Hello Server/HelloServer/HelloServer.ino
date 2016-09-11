@@ -91,7 +91,7 @@ void setup() {
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, pass);
 
-    // wait 5 seconds for retry:
+    // wait 10 seconds for retry:
     delay(10000);
   }
   printWifiData();
