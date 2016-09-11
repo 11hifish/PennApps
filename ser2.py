@@ -14,16 +14,12 @@ NormalClient=1
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Bind the socket to the port
-<<<<<<< HEAD
-server_address = ('localhost', 10002)
+server_address = ('yusihao51.pythonanywhere.com', 8080)
 print('starting up on %s port %s', server_address[0],server_address[1])
-=======
-server_address = ('', 80)
-print('starting up on %s port %s' % (server_address[0],server_address[1]))
->>>>>>> 17a32263e3f21caa8ca4ec27c9545b30eacc21db
 sock.bind(server_address)
 sock.listen(1)
 q = []
+#q.append(("2016/1/1/10:00pm", 0, 30))
 
 def query(q, id):
     for (t,i,s) in q:
@@ -46,33 +42,23 @@ def change_status_to_received(q, id, status):
             q.remove((time, id, status))
             q.insert((time, id, status_receivedResponse))
 
-
 while True:
     # Wait for a connection
     print('waiting for a connection')
     connection, client_address = sock.accept()
     try:
-        print ('connection from %s:%s' % client_address)
+        print ('connection from', client_address)
 
         # Receive the data in small chunks and retransmit it
         while True:
-<<<<<<< HEAD
-            data = connection.recv(50)
-            print ('received information: %s', data)
-=======
-            data = connection.recv(200);
-            print str(('received information: %s'%(data)))
->>>>>>> 17a32263e3f21caa8ca4ec27c9545b30eacc21db
+            data = connection.recv(1000)
+            print ('received information: %data')
             if data:
-                print(data)
                 s = data.split("_")
-                print(s)
-                if len(s) != 4:
-                    print("Parse Failure: ")
+                if len(s) != 3:
+                    print("Parse Failure: +")
                     print(s)
                     continue
-                s = s[1:]
-                print(s)
                 type = s[0]
                 id = int(s[1])
                 status = int(s[2])
@@ -81,14 +67,11 @@ while True:
                     print('sending data back to the client')
                     connection.sendall(time+"_"+str(id)+"_"+str(status))
                     change_status_to_sent(q, id, status)
-                if type == "Client":
-                    print(1)
-#                    if status == 1:
-                    connection.sendall("Received!")
-                    change_status_to_received(q, id, status)
+#                if type == "Client":
+#                    change_status_to_received(q, id, status)
 
             else:
-                print('no more data from %s:%s'% client_address)
+                print('no more data from', client_address)
                 break
             
     finally:
