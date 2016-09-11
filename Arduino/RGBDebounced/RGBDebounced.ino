@@ -171,7 +171,7 @@ void getStatus(char* &buffer, int size){
     if (client.connect(server, port )) {
       Serial.println("connected to server");
       // Make a HTTP request:
-      char* str = sprintf("UPDATE_%s",DEVICE_ID);
+      char* str = sprintf("UPDATE")//_%s",DEVICE_ID);
       client.write(str);
       Serial.println(s);
       return;
@@ -211,14 +211,14 @@ void loop() {
         if (buttonState == HIGH) {
           changeState(WAITING);
           ledDisplay();
-          char* str = sprintf("Pressed_%s",DEVICE_ID);
+          char* str = sprintf("Pressed")//_%s",DEVICE_ID);
           sendContent(str);
           char* buffer = new char[100];
           getStatus(buffer,100);
           if (buffer == "ACCEPTED"){
             changeState(ACCEPT);
           }
-          if (buffer == "DENY"){
+          if (buffer == "DENYED"){
             changeState(DENY);
           }
         }
