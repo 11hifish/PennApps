@@ -1,6 +1,6 @@
 # PennApps Project: Who'sThere
 
-devpost link: http://devpost.com/software/pennapps-iy1sd8#updates
+Devpost link: http://devpost.com/software/pennapps-iy1sd8#updates
 
 Purpose:
 
