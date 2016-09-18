@@ -34,7 +34,7 @@ MODIFIED AND ADAPTED FROM ARDUINO EXAMPLE and WIFI101 EXAMPLE.
  and
  https://www.arduino.cc/en/Reference/WiFi101
  */
-#define DEVICE_ID 0_65535
+  
 #include <SPI.h>
 #include <WiFi101.h>
 #include "SocketIOClient.h"
